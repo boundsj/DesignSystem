@@ -1,0 +1,49 @@
+---
+description: Sync color variables from Figma to Swift
+globs: 
+alwaysApply: false
+---
+
+# Figma Color Sync
+
+When the user asks to "sync Figma colors" or similar:
+
+## Prerequisites
+- User must have the Design Library file open in Figma Desktop (not browser)
+- File: https://www.figma.com/design/EY4dEkIjYNcF793t6O1koW/Design-Library
+
+## Steps
+
+1. **Fetch variables from Figma** using the MCP tool:
+   ```
+   Server: user-Figma Desktop
+   Tool: get_variable_defs
+   Arguments: {"nodeId": "0:1", "fileKey": "EY4dEkIjYNcF793t6O1koW", "clientLanguages": "swift", "clientFrameworks": "swiftui"}
+   ```
+
+2. **Parse the response** - it returns a flat object like:
+   ```json
+   {"slate/50": "#F8FAFC", "slate/100": "#F1F5F9", ...}
+   ```
+
+3. **Generate xcassets** - For each color:
+   - Path: `Sources/DesignSystem/Resources/Colors.xcassets/primitive/{palette}/{shade}.colorset/Contents.json`
+   - Convert hex to RGB floats (0-1 range)
+   - Use standard colorset JSON format
+
+4. **Generate DSColor.swift** at `Sources/DesignSystem/Tokens/DSColor.swift`:
+   - Include "DO NOT EDIT" header
+   - Group by palette (e.g., `DSColor.Slate.s50`)
+   - Include private `DSColorAssetName` enum and `Color.dsAsset()` extension
+
+## Color Path Conventions
+
+| Figma Variable | Asset Path | Swift API |
+|---------------|------------|-----------|
+| `slate/50` | `primitive/slate/50` | `DSColor.Slate.s50` |
+| `background` | `semantic/background` | `DSColor.background` |
+| `text/primary` | `semantic/text/primary` | `DSColor.textPrimary` |
+
+## After Sync
+- Run `swift build` to verify
+- The DSColorPreview.swift file may need manual updates if new palettes are added
