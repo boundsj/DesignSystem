@@ -14,7 +14,7 @@ Add DesignSystem as a Swift Package dependency:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/YOUR_ORG/DesignSystem.git", from: "1.0.0")
+    .package(url: "https://github.com/boundsj/DesignSystem.git", from: "1.0.0")
 ]
 ```
 
