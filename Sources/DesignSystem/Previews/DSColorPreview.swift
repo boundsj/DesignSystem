@@ -20,25 +20,28 @@ public struct DSColorPreview: View {
                 .foregroundStyle(DSColor.Slate.s900)
 
             VStack(spacing: 10) {
-                row("slate/50", DSColor.Slate.s50, text: DSColor.Slate.s900)
-                row("slate/100", DSColor.Slate.s100, text: DSColor.Slate.s900)
-                row("slate/200", DSColor.Slate.s200, text: DSColor.Slate.s900)
-                row("slate/300", DSColor.Slate.s300, text: DSColor.Slate.s900)
-                row("slate/400", DSColor.Slate.s400, text: DSColor.Slate.s900)
-                row("slate/500", DSColor.Slate.s500, text: DSColor.Slate.s50)
-                row("slate/600", DSColor.Slate.s600, text: DSColor.Slate.s50)
-                row("slate/700", DSColor.Slate.s700, text: DSColor.Slate.s50)
-                row("slate/800", DSColor.Slate.s800, text: DSColor.Slate.s50)
-                row("slate/900", DSColor.Slate.s900, text: DSColor.Slate.s50)
+                row("slate/50", DSColor.Slate.s50)
+                row("slate/100", DSColor.Slate.s100)
+                row("slate/200", DSColor.Slate.s200)
+                row("slate/300", DSColor.Slate.s300)
+                row("slate/400", DSColor.Slate.s400)
+                row("slate/500", DSColor.Slate.s500)
+                row("slate/600", DSColor.Slate.s600)
+                row("slate/700", DSColor.Slate.s700)
+                row("slate/800", DSColor.Slate.s800)
+                row("slate/900", DSColor.Slate.s900)
             }
         }
     }
 
-    private func row(_ name: String, _ color: Color, text: Color) -> some View {
+    private func row(
+        _ name: String,
+        _ color: Color
+    ) -> some View {
         HStack {
             Text(name)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(text)
+                .foregroundStyle(.black)
             Spacer()
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(color)
@@ -57,4 +60,8 @@ public struct DSColorPreview: View {
                 .stroke(DSColor.Slate.s200, lineWidth: 1)
         )
     }
+}
+
+#Preview {
+    DSColorPreview()
 }
