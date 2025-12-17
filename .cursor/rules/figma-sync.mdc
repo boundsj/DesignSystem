@@ -62,6 +62,14 @@ Every sync MUST regenerate ALL assets from scratch. Do not skip any step or assu
    - Semantics: Group by category (e.g., `DSColor.Background.primary`)
    - Include private `DSColorAssetName` enum and `Color.dsAsset()` extension
 
+6. **Verify generation** by running build and tests:
+   ```bash
+   swift build && swift test
+   ```
+   - Build must succeed (validates xcassets and DSColor.swift syntax)
+   - All tests must pass (validates color tokens are accessible at runtime)
+   - If tests fail, check that DSColor.swift matches what tests expect (see Test Reference below)
+
 ## Dark Mode Inverse Mapping
 
 The Figma API returns light mode values. Derive dark mode by matching to a primitive and using the inverse:
@@ -131,5 +139,22 @@ The Figma API returns light mode values. Derive dark mode by matching to a primi
 | `border/default`    | `semantic/border/default`     | `DSColor.Border.default`    |
 
 ## After Sync
-- Run `swift build` to verify
+- Build and tests must pass (step 6)
 - The DSColorPreview.swift file may need manual updates if new palettes/semantics are added
+
+## Test Reference
+
+Tests are located at `Tests/DesignSystemTests/DesignSystemTests.swift`. They validate:
+
+| Test | What it checks |
+|------|----------------|
+| `testColorTokensCompile` | DSColor.Slate tokens are accessible |
+| `testSlateColorsPresentAndType` | All slate primitives (s50–s900) exist and are `Color` type |
+| `testBackgroundColorsPresentAndType` | All background semantics (primary, secondary, tertiary) exist and are `Color` type |
+
+**If you add new semantic categories** (e.g., `text/*`, `border/*`), you should also add corresponding tests.
+
+**If tests fail after sync:**
+1. Check that DSColor.swift was generated with all expected tokens
+2. Check that colorset directories exist with valid Contents.json files
+3. Ensure the test expectations match the Figma variables
