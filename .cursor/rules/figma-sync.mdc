@@ -12,6 +12,14 @@ When the user asks to "sync Figma colors" or similar:
 - User must have the Design Library file open in Figma Desktop (not browser)
 - File: https://www.figma.com/design/EY4dEkIjYNcF793t6O1koW/Design-Library
 
+## IMPORTANT: Full Regeneration Required
+
+Every sync MUST regenerate ALL assets from scratch. Do not skip any step or assume files exist.
+- ALWAYS regenerate ALL colorset Contents.json files (both primitives and semantics)
+- ALWAYS regenerate DSColor.swift completely
+- Create any missing directories (semantic/, semantic/background/, etc.)
+- The sync must be idempotent: running it twice should produce identical results
+
 ## Steps
 
 1. **Fetch variables from Figma** using the MCP tool:
@@ -23,27 +31,105 @@ When the user asks to "sync Figma colors" or similar:
 
 2. **Parse the response** - it returns a flat object like:
    ```json
-   {"slate/50": "#F8FAFC", "slate/100": "#F1F5F9", ...}
+   {
+     "slate/50": "#F8FAFC",
+     "background/primary": "#f8fafc"
+   }
    ```
 
-3. **Generate xcassets** - For each color:
-   - Path: `Sources/DesignSystem/Resources/Colors.xcassets/primitive/{palette}/{shade}.colorset/Contents.json`
-   - Convert hex to RGB floats (0-1 range)
-   - Use standard colorset JSON format
+3. **Categorize variables**:
+   - **Primitives**: Match pattern `{palette}/{shade}` where shade is numeric (e.g., `slate/50`)
+   - **Semantics**: Match pattern `{category}/{name}` where category is `background`, `text`, or `border`
 
-4. **Generate DSColor.swift** at `Sources/DesignSystem/Tokens/DSColor.swift`:
+4. **Generate xcassets** (ALWAYS regenerate, even if files exist):
+
+   **For Primitives** (no dark mode):
+   - Create directory if missing: `Sources/DesignSystem/Resources/Colors.xcassets/primitive/{palette}/{shade}.colorset/`
+   - Write `Contents.json` with single appearance (universal)
+   - Convert hex to RGB floats (divide by 255, format to 3 decimal places)
+
+   **For Semantics** (with dark mode):
+   - Create directories if missing: `Sources/DesignSystem/Resources/Colors.xcassets/semantic/` and `semantic/{category}/`
+   - Add `Contents.json` to each directory (standard xcassets folder marker)
+   - Create `semantic/{category}/{name}.colorset/Contents.json`
+   - Dual appearances: universal (light) + dark
+   - Derive dark mode value using inverse slate mapping (see below)
+   - Match the light hex to a primitive, then use the inverse primitive's RGB values for dark
+
+5. **Generate DSColor.swift** at `Sources/DesignSystem/Tokens/DSColor.swift`:
    - Include "DO NOT EDIT" header
-   - Group by palette (e.g., `DSColor.Slate.s50`)
+   - Primitives: Group by palette (e.g., `DSColor.Slate.s50`)
+   - Semantics: Group by category (e.g., `DSColor.Background.primary`)
    - Include private `DSColorAssetName` enum and `Color.dsAsset()` extension
+
+## Dark Mode Inverse Mapping
+
+The Figma API returns light mode values. Derive dark mode by matching to a primitive and using the inverse:
+
+| Light (Primitive) | Dark (Inverse) |
+|-------------------|----------------|
+| slate/50          | slate/900      |
+| slate/100         | slate/800      |
+| slate/200         | slate/700      |
+| slate/300         | slate/600      |
+| slate/400         | slate/500      |
+| slate/500         | slate/400      |
+| slate/600         | slate/300      |
+| slate/700         | slate/200      |
+| slate/800         | slate/100      |
+| slate/900         | slate/50       |
+
+## Colorset JSON Formats
+
+**Primitive (single appearance):**
+```json
+{
+  "colors": [
+    {
+      "color": {
+        "color-space": "srgb",
+        "components": { "alpha": "1.000", "blue": "0.988", "green": "0.980", "red": "0.973" }
+      },
+      "idiom": "universal"
+    }
+  ],
+  "info": { "author": "xcode", "version": 1 }
+}
+```
+
+**Semantic (light + dark appearances):**
+```json
+{
+  "colors": [
+    {
+      "color": {
+        "color-space": "srgb",
+        "components": { "alpha": "1.000", "blue": "...", "green": "...", "red": "..." }
+      },
+      "idiom": "universal"
+    },
+    {
+      "appearances": [{ "appearance": "luminosity", "value": "dark" }],
+      "color": {
+        "color-space": "srgb",
+        "components": { "alpha": "1.000", "blue": "...", "green": "...", "red": "..." }
+      },
+      "idiom": "universal"
+    }
+  ],
+  "info": { "author": "xcode", "version": 1 }
+}
+```
 
 ## Color Path Conventions
 
-| Figma Variable | Asset Path | Swift API |
-|---------------|------------|-----------|
-| `slate/50` | `primitive/slate/50` | `DSColor.Slate.s50` |
-| `background` | `semantic/background` | `DSColor.background` |
-| `text/primary` | `semantic/text/primary` | `DSColor.textPrimary` |
+| Figma Variable       | Asset Path                    | Swift API                   |
+|---------------------|-------------------------------|-----------------------------|
+| `slate/50`          | `primitive/slate/50`          | `DSColor.Slate.s50`         |
+| `background/primary`| `semantic/background/primary` | `DSColor.Background.primary`|
+| `text/primary`      | `semantic/text/primary`       | `DSColor.Text.primary`      |
+| `border/default`    | `semantic/border/default`     | `DSColor.Border.default`    |
 
 ## After Sync
 - Run `swift build` to verify
-- The DSColorPreview.swift file may need manual updates if new palettes are added
+- The DSColorPreview.swift file may need manual updates if new palettes/semantics are added

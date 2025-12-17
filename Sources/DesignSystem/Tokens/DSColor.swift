@@ -19,6 +19,13 @@ public enum DSColor {
         public static let s800 = Color.dsAsset(.slate800)
         public static let s900 = Color.dsAsset(.slate900)
     }
+
+    // MARK: - Semantics (Background)
+    public enum Background {
+        public static let primary = Color.dsAsset(.backgroundPrimary)
+        public static let secondary = Color.dsAsset(.backgroundSecondary)
+        public static let tertiary = Color.dsAsset(.backgroundTertiary)
+    }
 }
 
 private enum DSColorAssetName: String {
@@ -33,6 +40,11 @@ private enum DSColorAssetName: String {
     case slate700 = "primitive/slate/700"
     case slate800 = "primitive/slate/800"
     case slate900 = "primitive/slate/900"
+
+    // Semantics - Background
+    case backgroundPrimary = "semantic/background/primary"
+    case backgroundSecondary = "semantic/background/secondary"
+    case backgroundTertiary = "semantic/background/tertiary"
 }
 
 private extension Color {

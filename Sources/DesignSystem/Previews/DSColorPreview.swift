@@ -41,7 +41,7 @@ public struct DSColorPreview: View {
         HStack {
             Text(name)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.black)
+                .foregroundStyle(.black )
             Spacer()
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(color)
