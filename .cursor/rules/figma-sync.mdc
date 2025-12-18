@@ -50,7 +50,13 @@ Every sync MUST regenerate ALL assets from scratch. Do not skip any step or assu
 
    **For Semantics** (with dark mode):
    - Create directories if missing: `Sources/DesignSystem/Resources/Colors.xcassets/semantic/` and `semantic/{category}/`
-   - Add `Contents.json` to each directory (standard xcassets folder marker)
+   - Add `Contents.json` to each directory with `provides-namespace: true` (required for path-based loading):
+     ```json
+     {
+       "info": { "author": "xcode", "version": 1 },
+       "properties": { "provides-namespace": true }
+     }
+     ```
    - Create `semantic/{category}/{name}.colorset/Contents.json`
    - Dual appearances: universal (light) + dark
    - Derive dark mode value using inverse slate mapping (see below)

@@ -5,12 +5,16 @@ public struct DSColorPreview: View {
 
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(
+                alignment: .leading,
+                spacing: 16
+            ) {
                 primitiveSection
+                semanticSection
             }
             .padding(16)
         }
-        .background(DSColor.Slate.s50)
+        .background(Color.white)
     }
 
     private var primitiveSection: some View {
@@ -32,6 +36,47 @@ public struct DSColorPreview: View {
                 row("slate/900", DSColor.Slate.s900)
             }
         }
+    }
+    
+    private var semanticSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Semantics / Background")
+                .font(.headline)
+                .foregroundStyle(DSColor.Slate.s900)
+            
+            VStack(spacing: 10) {
+                semanticRow("primary", DSColor.Background.primary)
+                semanticRow("secondary", DSColor.Background.secondary)
+                semanticRow("tertiary", DSColor.Background.tertiary)
+            }
+        }
+    }
+    
+    private func semanticRow(
+        _ name: String,
+        _ color: Color
+    ) -> some View {
+        HStack {
+            Text("background/\(name)")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.black)
+            Spacer()
+            color
+                .frame(width: 44, height: 28)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(DSColor.Slate.s200, lineWidth: 1)
+                )
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(DSColor.Slate.s200, lineWidth: 1)
+        )
     }
 
     private func row(
@@ -64,4 +109,5 @@ public struct DSColorPreview: View {
 
 #Preview {
     DSColorPreview()
+        .frame(minHeight: 850)
 }
