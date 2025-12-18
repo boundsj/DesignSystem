@@ -1,9 +1,10 @@
+#if DEBUG && canImport(SwiftUI)
 import SwiftUI
 
-public struct DSColorPreview: View {
-    public init() {}
+struct DSColorPreview: View {
+    init() {}
 
-    public var body: some View {
+    var body: some View {
         ScrollView {
             VStack(
                 alignment: .leading,
@@ -111,3 +112,4 @@ public struct DSColorPreview: View {
     DSColorPreview()
         .frame(minHeight: 850)
 }
+#endif
